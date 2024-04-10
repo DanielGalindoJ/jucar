@@ -1,52 +1,54 @@
 import React from "react";
 import {
-  View,
   Image,
   ScrollView,
   StyleSheet,
-  // Pressable,
   Pressable,
   StatusBar,
-  Card,
+  Dimensions,
 } from "react-native";
 import { Text } from "react-native-paper";
-
+import { View } from "react-native";
 import Logo from "../assets/imgs/jucar.jpg";
+import iconoCategoria from "../assets/imgs/Categorias2.png";
+import iconoAutoparte from "../assets/imgs/Autopartes.png";
+import iconoMateriaPrima from "../assets/imgs/MateriaP.png";
 
 const Productos = ({ navigation }) => {
   return (
-    <ScrollView>
-      <View style={styles.container}>
-        <View style={styles.navbar}>
+    <ScrollView contentContainerStyle={styles.container}>
+      <StatusBar backgroundColor="#f80759" />
+      <View style={styles.card}>
+        <View style={styles.header}>
           <Image source={Logo} style={styles.logo} />
-
           <Text style={styles.title}>AUTOPARTES JUCAR SAS</Text>
         </View>
-
-        <View>
-          <Text style={styles.title}> {"\n"} PRODUCTOS</Text>
-
+        <View style={styles.content}>
+          <Text style={styles.subTitle}>Productos</Text>
           <Pressable
             style={styles.botones}
             onPress={() =>
               navigation.navigate("EscogerCategoriasSubactegorias")
             }
           >
-            <Text style={styles.botonesText}>Categorias</Text>
+            <Image source={iconoCategoria} style={styles.iconoBoton} />
+            <Text style={styles.botonesText}>CATEGORIAS</Text>
           </Pressable>
 
           <Pressable
             style={styles.botones}
             onPress={() => navigation.navigate("EscogerAutoparte")}
           >
-            <Text style={styles.botonesText}>Autopartes</Text>
+            <Image source={iconoAutoparte} style={styles.iconoBoton} />
+            <Text style={styles.botonesText}>AUTOPARTES</Text>
           </Pressable>
 
           <Pressable
             style={styles.botones}
-            onPress={() => navigation.navigate("MateriasPrima")}
+            onPress={() => navigation.navigate("rawMaterials")}
           >
-            <Text style={styles.botonesText}>Materias Prima</Text>
+            <Image source={iconoMateriaPrima} style={styles.iconoBoton} />
+            <Text style={styles.botonesText}>MATERIAS PRIMAS</Text>
           </Pressable>
         </View>
       </View>
@@ -56,84 +58,72 @@ const Productos = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: "#fff",
+    flexGrow: 1,
+    backgroundColor: "#F5F5DC",
+    alignItems: "center",
+    justifyContent: "center",
   },
-  navbar: {
-    backgroundColor: "#f80759",
-    color: "#fff",
-    borderColor: "#03a9f4",
+  header: {
     flexDirection: "row",
-    justifyContent: "space-evenly",
-    alignItems: "flex-start",
-    padding: 30,
-    fontWeight: 500,
-
-    marginTop: 1,
+    alignItems: "center",
+    paddingVertical: 20,
   },
   logo: {
     width: 107,
     height: 57,
     resizeMode: "contain",
-    marginLeft: 50,
+    marginRight: 10,
   },
   title: {
     fontSize: 18,
-    color: "#fff",
     fontWeight: "bold",
-    marginLeft: 128,
-    marginRight: -21,
-    marginBottom: -19,
-    width: 269.906,
-    height: 68,
   },
-  container: {
-    marginTop: 1,
-    justifyContent: "center",
-    // alignItems: 'center',
+  content: {
     flex: 1,
-  },
-  // card: {
-  //   borderRadius: 30,
-  //   width: "80%",
-  //   backgroundColor: "#fff",
-  //   padding: 25,
-  //   boxshadowColor: "#000",
-  //   boxshadowOffset: { width: 0, height: 2 },
-  //   boxshadowOpacity: 0.25,
-  //   boxshadowRadius: 4,
-  //   elevation: 1,
-  //   marginTop: 33,
-  //   justifyContent: "center",
-  //   alignItems: "center",
-  //   marginLeft: 35,
-  // },
-
-  botonesContainer: {
-    height: "70%",
-    width: "100%",
     justifyContent: "center",
     alignItems: "center",
-    margin: "10%",
+    padding: 20,
+  },
+  subTitle: {
+    fontSize: 27,
+    fontWeight: "bold",
+    marginBottom: 20,
+    color: "#000",
+    textAlign: "center",
   },
   botones: {
-    padding: 5,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     backgroundColor: "#f80759",
-    borderColor: "#000000",
+    borderColor: "#000",
     borderWidth: 3,
     borderRadius: 10,
-    fontSize: 25,
+    paddingVertical: 20,
+    paddingHorizontal: 10,
+    marginBottom: 10,
     width: "80%",
-    margin: 5,
-    boxshadowColor: "#000000",
-    boxshadowOpacity: 0,
-    fontFamily: "sans-",
+    maxWidth: 300,
+  },
+  iconoBoton: {
+    width: 40,
+    height: 30,
+    marginRight: 20,
   },
   botonesText: {
-    textAlign: "center",
-    fontSize: 25,
+    fontSize: 20,
     color: "#fff",
-    textTransform: "uppercase",
+    fontFamily: "sans-serif",
+  },
+  card: {
+    borderRadius: 30,
+    width: "80%",
+    backgroundColor: "#fff",
+    padding: 25,
+    elevation: 5,
+    alignSelf: "center",
+    marginTop: 50,
   },
 });
+
 export default Productos;

@@ -1,41 +1,47 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
-  View,
-  Image,
   ScrollView,
+  View,
   StyleSheet,
-  Pressable,
+  Image,
   StatusBar,
+  Pressable,
 } from "react-native";
 import { Text } from "react-native-paper";
+import { Dimensions } from "react-native";
+import axios from "axios";
 import Logo from "../assets/imgs/jucar.jpg";
-import IconoTodas from "../assets/imgs/Autopartes.png";
-import IconoId from "../assets/imgs/Autopartes.png";
+import Usuario from "../assets/imgs/Usuario.png";
 
-const EscogerAutoparte = ({ navigation }) => {
+const Proveedores = ({ navigation }) => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <StatusBar backgroundColor="#f80759" barStyle="light-content" />
       <View style={styles.card}>
+        {/* encabezado */}
         <View style={styles.navbar}>
           <Image source={Logo} style={styles.logo} />
           <Text style={styles.title}>AUTOPARTES JUCAR SAS</Text>
         </View>
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>PRODUCTOS</Text>
+          <Text style={styles.sectionTitle}>CLIENTES</Text>
+
+          {/* Boton para todos los clientes */}
           <Pressable
             style={styles.button}
-            onPress={() => navigation.navigate("AllAutoparts")}
+            onPress={() => navigation.navigate("AllCustomer")}
           >
-            <Image source={IconoTodas} style={styles.icon} />
-            <Text style={styles.buttonText}>Todas las Autopartes</Text>
+            <Image source={Usuario} style={styles.icon} />
+            <Text style={styles.buttonText}>Todos los Clientes</Text>
           </Pressable>
+
+          {/* Boton para los clientes */}
           <Pressable
             style={styles.button}
-            onPress={() => navigation.navigate("MenuAutoparts")}
+            onPress={() => navigation.navigate("Customers")}
           >
-            <Image source={IconoTodas} style={styles.icon} />
-            <Text style={styles.buttonText}>Menu Autopartes</Text>
+            <Image source={Usuario} style={styles.icon} />
+            <Text style={styles.buttonText}>Clientes</Text>
           </Pressable>
         </View>
       </View>
@@ -56,7 +62,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    padding: 40,
+    padding: 20,
   },
   logo: {
     width: 107,
@@ -96,7 +102,6 @@ const styles = StyleSheet.create({
     color: "#fff",
     textTransform: "uppercase",
     marginLeft: 5,
-    verticalAlign: "center",
   },
   icon: {
     width: 40,
@@ -108,11 +113,9 @@ const styles = StyleSheet.create({
     width: "80%",
     backgroundColor: "#fff",
     padding: 25,
-    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.25)", // Reemplazo de las propiedades de sombra
     elevation: 5,
     alignSelf: "center",
     marginTop: 50,
   },
 });
-
-export default EscogerAutoparte;
+export default Proveedores;

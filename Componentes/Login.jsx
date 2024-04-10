@@ -1,106 +1,128 @@
+import React, { useState, useEffect } from "react";
 import {
   ScrollView,
   Image,
   View,
-  // Pressable,
-  Pressable,
   StyleSheet,
-  Card, // Card no se está usando
-  Alert, // Faltaba importar Alert
-  TextInput, // Faltaba importar TextInput
+  TextInput,
+  Pressable,
+  Alert,
 } from "react-native";
 import { Text } from "react-native-paper";
-import React from "react";
-import { useState } from "react";
-import Logo from "../assets/imgs/jucar.jpg";
 import axios from "axios";
+import { MaterialIcons } from "@expo/vector-icons";
 
 const Login = ({ navigation }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  // const val = useContext (AuthContext)
-  //   const {isLoading, login} =useContext(AuthConstext)
+  const [showPassword, setShowPassword] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [showErrorMessage, setShowErrorMessage] = useState(false);
 
   const handleLogin = async () => {
     try {
-      // Configura la URL de tu API
-      const apiUrl = "https://localhost:7028/api/authentication/login";
+      if (!username || !password) {
+        throw new Error("Por favor completa todos los campos");
+      }
 
-      // Realiza la llamada a la API con Axios
+      const apiUrl = "https://localhost:7028/api/authentication/login";
       const response = await axios.post(apiUrl, {
         username: username,
         password: password,
       });
 
-      // Aquí puedes manejar la respuesta de la API según tus necesidades
       console.log("Respuesta de la API:", response.data);
 
-      // Por ejemplo, puedes mostrar un mensaje de éxito
-      Alert.alert("Éxito", "Inicio de sesión exitoso");
+      setShowSuccessMessage(true);
+      setTimeout(() => {
+        setShowSuccessMessage(false);
+        navigation.navigate("Menu");
+      }, 1000);
     } catch (error) {
-      // Maneja los errores de la llamada a la API
-      console.error("Error al iniciar sesión:", error);
-
-      // Muestra un mensaje de error
-      Alert.alert(
-        "Error",
-        "Error al iniciar sesión. Por favor, intenta nuevamente."
-      );
+      console.error("Error al iniciar sesión:", error.message);
+      setShowErrorMessage(true);
+      setTimeout(() => {
+        setShowErrorMessage(false);
+      }, 1000);
     }
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      {showSuccessMessage && (
+        <View style={styles.successMessageContainer}>
+          <Text style={styles.successMessageText}>
+            Inicio de sesión exitoso
+          </Text>
+        </View>
+      )}
+      {showErrorMessage && (
+        <View style={styles.errorMessageContainer}>
+          <Text style={styles.errorMessageText}>
+            Credenciales incorrectas. Por favor, intenta nuevamente.
+          </Text>
+        </View>
+      )}
       <View style={styles.card}>
-        <View style={styles.navbar}>
-          <Image source={Logo} style={styles.logo} />
-
+        <View style={styles.header}>
+          <Image
+            source={require("../assets/imgs/jucar.jpg")}
+            style={styles.logo}
+          />
           <Text style={styles.title}>AUTOPARTES JUCAR SAS</Text>
         </View>
 
-        <View style={styles.card}>
-          <View style={styles.form}>
-            <Image
-              source={{
-                uri: "https://us.123rf.com/450wm/rigsby8131/rigsby81311704/rigsby8131170400147/75488593-tuercas-pernos-y-arandelas-en-un-fondo-de-acero.jpg?ver=6",
-              }}
-              style={styles.image}
-            />
+        <View style={styles.form}>
+          <Image
+            source={{
+              uri: "https://us.123rf.com/450wm/rigsby8131/rigsby81311704/rigsby8131170400147/75488593-tuercas-pernos-y-arandelas-en-un-fondo-de-acero.jpg?ver=6",
+            }}
+            style={{ ...styles.image, resizeMode: "contain" }} // Ajuste aquí
+          />
+          <Text style={styles.titleInicard}>Iniciar sesión</Text>
 
-            <Text style={styles.titleInicard}>Iniciar sesión</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Usuario"
+            value={username}
+            onChangeText={(text) => setUsername(text)}
+          />
 
+          <View style={styles.passwordContainer}>
             <TextInput
-              style={styles.input}
-              placeholder="Usuario"
-              value={username}
-              onChangeText={(Text) => setUsername(Text)}
-            />
-
-            <TextInput
-              style={styles.input}
+              style={styles.passwordInput}
               placeholder="Contraseña"
-              secureTextEntry={true}
+              secureTextEntry={!showPassword}
               value={password}
-              onChangeText={(Text) => setPassword(Text)}
+              onChangeText={(text) => setPassword(text)}
             />
+            <Pressable onPress={() => setShowPassword(!showPassword)}>
+              <MaterialIcons
+                name={showPassword ? "visibility-off" : "visibility"}
+                size={24}
+                color="black"
+              />
+            </Pressable>
           </View>
+
+          <Pressable style={styles.button} onPress={handleLogin}>
+            <Text style={styles.buttontxt}>Ingresar</Text>
+          </Pressable>
+          <Pressable
+            style={styles.link}
+            onPress={() => navigation.navigate("Registro")}
+          >
+            <Text style={styles.linkText}>
+              ¿No tienes una cuenta? Regístrate aquí
+            </Text>
+          </Pressable>
         </View>
-
-        <Pressable
-          style={styles.button}
-          onPress={(handleLogin) => navigation.navigate("Menu")}
-        >
-          <Text style={styles.buttontxt}> Ingresar </Text>
-        </Pressable>
-
-        {/* Footer (pie de pagina) */}
 
         <View style={styles.footer}>
           <View style={styles.containerFooter}>
             <Text style={styles.titleFooter}>
               Derechos reservados Jucar S.A.S
             </Text>
-
             <Text style={styles.titleFooter}>Calle 7 #90-76</Text>
           </View>
         </View>
@@ -111,79 +133,36 @@ const Login = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  navbar: {
-    backgroundColor: "#f80759",
-    color: "#fff",
-    borderColor: "#03a9f4",
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    alignItems: "flex-start",
-    padding: 30,
-    fontWeight: 500,
-
-    marginTop: 1,
+    flexGrow: 1,
+    justifyContent: "center",
+    backgroundColor: "#f0f0f0",
   },
   logo: {
-    width: 107,
-    height: 57,
-    resizeMode: "contain",
-    marginLeft: 50,
+    width: "40%",
+    height: 50,
+    marginRight: 10,
   },
   title: {
     fontSize: 18,
-    color: "#fff",
     fontWeight: "bold",
-    marginLeft: 128,
-    marginRight: -21,
-    marginBottom: -19,
-    width: 269.906,
-    height: 68,
   },
-  container: {
-    marginTop: 1,
-    justifyContent: "center",
-    // alignItems: 'center',
-    flex: 1,
-  },
-
-  //card
-  container: {
-    marginTop: 1,
-    // justifyContent: 'center',
-    // alignItems: 'center',
-    flex: 1,
-  },
-
   card: {
     borderRadius: 30,
-    width: "80%",
+    width: "100%",
     backgroundColor: "#fff",
     padding: 25,
-    boxshadowColor: "#000",
-    boxshadowOffset: { width: 0, height: 2 },
-    boxshadowOpacity: 0.25,
-    boxshadowRadius: 4,
-    elevation: 1,
-    marginTop: 33,
-    justifyContent: "center",
-    alignItems: "center",
-    marginLeft: 35,
+    elevation: 5,
+    alignSelf: "center",
   },
-
   image: {
-    width: 250,
+    width: "80%",
     height: 180,
     borderRadius: 10,
+    marginBottom: 20,
   },
-
   form: {
-    marginTop: 1,
-    padding: 2,
+    alignItems: "center",
   },
-
   titleInicard: {
     fontSize: 24,
     fontWeight: "bold",
@@ -192,84 +171,100 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textTransform: "uppercase",
   },
-
   input: {
+    width: "100%",
     fontSize: 20,
-    padding: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
     borderWidth: 1,
-    borderColor: "black",
+    borderColor: "#ccc",
     marginBottom: 20,
-  },
-
-  button: {
-    backgroundColor: "#f80759",
-    padding: 10,
-    marginTop: 10,
-    marginLeft: 30,
-    marginRight: 30,
     borderRadius: 10,
   },
-
+  passwordContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 10,
+    marginBottom: 20,
+    width: "100%",
+  },
+  passwordInput: {
+    flex: 1,
+    fontSize: 20,
+    paddingHorizontal: 20,
+  },
+  button: {
+    backgroundColor: "#f80759",
+    paddingVertical: 15,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    marginBottom: 20,
+  },
   buttontxt: {
     textAlign: "center",
     color: "#fff",
     fontSize: 20,
     textTransform: "uppercase",
   },
-
   link: {
-    fontSize: 16,
-    color: "#9E9E9E",
-    marginTop: 15,
+    marginBottom: 20,
   },
-
-  //footer
-
+  linkText: {
+    color: "blue",
+    textDecorationLine: "underline",
+  },
   footer: {
     backgroundColor: "black",
-    color: "white",
-    borderColor: "red",
-    margin: 15,
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 5,
-    marginEnd: "auto",
-    marginLeft: "auto",
-    flexDirection: "row",
+    marginVertical: 20,
   },
-
   containerFooter: {
     width: "80%",
-    margin: 50,
-    padding: 20,
+    paddingVertical: 20,
   },
-
   titleFooter: {
     fontSize: 17,
     textAlign: "center",
-    height: 30,
-    marginBottom: -5,
     color: "white",
+    marginBottom: 10,
   },
-
-  address: {
-    fontSize: 17,
-    width: "60%",
-    height: 24.5,
-    margin: 16,
-    textAlign: "center",
-    padding: 10,
-    backgroundColor: "white",
-  },
-
-  socialIcons: {
+  header: {
     flexDirection: "row",
-    justifyContent: "space-between",
-    width: "2%",
-    //margin: 2,
-    padding: 20,
-    backgroundColor: "white",
-    marginRight: 200,
+    alignItems: "center",
+    paddingVertical: 20,
+  },
+
+  successMessageContainer: {
+    backgroundColor: "#4caf50",
+    paddingVertical: 15,
+    paddingHorizontal: 10,
+    alignItems: "center",
+    justifyContent: "flex-start",
+    marginBottom: 20,
+    borderRadius: 10,
+  },
+  successMessageText: {
+    color: "#ffffff",
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  errorMessageContainer: {
+    backgroundColor: "#f44336",
+    paddingVertical: 15,
+    paddingHorizontal: 10,
+    alignItems: "flex-start",
+    justifyContent: "flex-start",
+    marginBottom: 20,
+    borderRadius: 10,
+  },
+  errorMessageText: {
+    color: "#ffffff",
+    fontSize: 20,
+    fontWeight: "bold",
   },
 });
 

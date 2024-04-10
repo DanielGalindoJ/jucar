@@ -4,161 +4,129 @@ import {
   Image,
   ScrollView,
   StyleSheet,
-  // Pressable,
   Pressable,
   StatusBar,
-  TouchableOpacity,
+  Dimensions,
 } from "react-native";
 
 import { Text } from "react-native-paper";
 import Logo from "../assets/imgs/jucar.jpg";
-import flechaAtras from "../assets/imgs/flecha-pequena-izquierda.png";
+import iconoProductos from "../assets/imgs/Tuerca.png";
+import iconoProveedores from "../assets/imgs/Proveedor.png";
+import iconoNegocio from "../assets/imgs/Portafolio77.png";
+import iconoUsuarios from "../assets/imgs/Usuario.png";
 
 const Menu = ({ navigation }) => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="red" />
+      <View style={styles.card}>
+        <View style={styles.header}>
+          <Image source={Logo} style={styles.logo} />
+          <Text style={styles.title}>AUTOPARTES JUCAR SAS</Text>
+        </View>
 
-      <View style={styles.imagenContainer}>
-        <Pressable style={styles.touchImage} activeOpacity={1}>
-          <View style={styles.navbar}>
-            <Image source={Logo} style={styles.logo} />
+        <Text style={styles.menuTitle}>Menu</Text>
 
-            <Text style={styles.title}>AUTOPARTES JUCAR SAS</Text>
-          </View>
-        </Pressable>
+        <View style={styles.buttonsContainer}>
+          <Pressable
+            style={styles.button}
+            onPress={() => navigation.navigate("Productos")}
+          >
+            <Image source={iconoProductos} style={styles.buttonIcon} />
+            <Text style={styles.buttonText}>Productos</Text>
+          </Pressable>
 
-        <Text style={styles.text}> {"\n"}Menu</Text>
-      </View>
+          <Pressable
+            style={styles.button}
+            onPress={() => navigation.navigate("Escoger_Proveedor")}
+          >
+            <Image source={iconoProveedores} style={styles.buttonIcon} />
+            <Text style={styles.buttonText}>Proveedores</Text>
+          </Pressable>
 
-      <TouchableOpacity
-        style={styles.tabItem}
-        onPress={() => navigation.navigate("Login")}
-      >
-        <Image source={flechaAtras} style={styles.tabIcon} />
-        {/* Render user name or placeholder text here */}
-      </TouchableOpacity>
-
-      <View style={styles.botonesContainer}>
-        <Pressable
-          style={styles.botones}
-          onPress={() => navigation.navigate("Productos")}
-        >
-          <Text style={styles.botonesText}>Productos</Text>
-        </Pressable>
-
-        <Pressable
-          style={styles.botones}
-          onPress={() => navigation.navigate("Proveedores")}
-        >
-          <Text style={styles.botonesText}>Proveedores</Text>
-        </Pressable>
-
-        <Pressable
-          style={styles.botones}
-          onPress={() => navigation.navigate("Negocio")}
-        >
-          <Text style={styles.botonesText}>Negocio</Text>
-        </Pressable>
-
-        <Pressable
-          style={styles.botones}
-          onPress={() => navigation.navigate("Users")}
-        >
-          <Text style={styles.botonesText}>Usuarios</Text>
-        </Pressable>
+          <Pressable
+            style={styles.button}
+            onPress={() => navigation.navigate("Escoger_Customer")}
+          >
+            <Image source={iconoNegocio} style={styles.buttonIcon} />
+            <Text style={styles.buttonText}>Ventas</Text>
+          </Pressable>
+        </View>
       </View>
     </ScrollView>
   );
 };
 
+const { width } = Dimensions.get("window");
+const buttonWidth = width * 0.8;
+
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flexGrow: 1,
     backgroundColor: "#F5F5DC",
-    justifyContent: "flex-start",
+    paddingVertical: 20,
+    paddingHorizontal: 10,
+  },
+  header: {
+    flexDirection: "row",
     alignItems: "center",
-    paddingTop: "5%",
+    paddingVertical: 20,
   },
-  botonesContainer: {
-    height: "70%",
-    width: "100%",
-    justifyContent: "center",
-    alignItems: "center",
-    margin: "10%",
+  logo: {
+    width: 100,
+    height: 50,
+    resizeMode: "contain",
+    marginRight: 10,
   },
-  imagenContainer: {
-    height: "20%",
-    width: "100%",
-    justifyContent: "center",
-    alignItems: "center",
-    display: "flex",
+  title: {
+    fontSize: 18,
+    fontWeight: "bold",
   },
-  botones: {
-    padding: 5,
-    backgroundColor: "#f80759",
-    borderColor: "#000000",
-    borderWidth: 3,
-    borderRadius: 10,
-    fontSize: 25,
-    width: "80%",
-    margin: 5,
-    boxshadowColor: "#000000",
-    boxshadowOpacity: 0,
-    fontFamily: "sans-",
-  },
-  botonesText: {
-    textAlign: "center",
-    fontSize: 25,
-    color: "#fff",
-    textTransform: "uppercase",
-  },
-  text: {
+  menuTitle: {
     fontFamily: "Aclonica",
     fontSize: 30,
     textAlign: "center",
     textTransform: "uppercase",
+    marginBottom: 20,
   },
-  navbar: {
-    backgroundColor: "#f80759",
-    color: "#fff",
-    borderColor: "#03a9f4",
-    flexDirection: "row",
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-evenly",
+  buttonsContainer: {
+    flex: 1,
+    justifyContent: "center",
     alignItems: "center",
-    padding: 30,
-    fontWeight: 500,
-
-    marginTop: 1,
   },
-  logo: {
-    width: 107,
-    height: 57,
-    resizeMode: "contain",
-    marginLeft: 50,
+  button: {
+    flexDirection: "row",
+    padding: 20,
+    backgroundColor: "#f80759",
+    borderColor: "#000",
+    borderWidth: 3,
+    borderRadius: 10,
+    width: buttonWidth,
+    marginVertical: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.25)",
   },
-  title: {
-    fontSize: 18,
+  buttonIcon: {
+    width: 50,
+    height: 50,
+    marginRight: 10,
+  },
+  buttonText: {
+    fontSize: 25,
     color: "#fff",
-    fontWeight: "bold",
-    marginLeft: 128,
-    marginRight: -21,
-    marginBottom: -19,
-    width: 269.906,
-    height: 68,
+    textTransform: "uppercase",
   },
-  //icons
-  tabItem: {
-    padding: 70,
-    display: "flex",
-    alignItems: "flex-end",
-  },
-  tabIcon: {
-    width: 54,
-    height: 54,
-    // ... other styles
+  card: {
+    borderRadius: 30,
+    width: buttonWidth,
+    backgroundColor: "#fff",
+    padding: 25,
+    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.25)",
+    alignSelf: "center",
+    marginTop: 50,
   },
 });
+
 export default Menu;

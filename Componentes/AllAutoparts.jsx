@@ -1,233 +1,248 @@
-import React, { useEffect, useState } from "react";
-import {
-  ScrollView,
-  View,
-  StyleSheet,
-  Modal,
-  TouchableOpacity,
-  Pressable,
-  Image,
-} from "react-native";
-import { Text } from "react-native-paper";
-import agregarUsu from "../assets/imgs/agregarUsuario.png";
-import ajustes from "../assets/imgs/ajustes.png";
-import { DataTable } from "react-native-paper";
+import React, { useState, useEffect } from "react";
+import { View, Modal, FlatList, StyleSheet, Image } from "react-native";
 import axios from "axios";
 import Logo from "../assets/imgs/jucar.jpg";
+import { Divider, Card, Text, Button } from "react-native-paper";
 
-const AllAutoparts = () => {
-  const [items, setItems] = useState([]);
-  const [selectedItem, setSelectedItem] = useState(null);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [error, setError] = useState(null);
-  const [autoparts, setAutopart] = useState([]);
+const AllAutoparts = ({ subcategoryId }) => {
+  const [autoparts, setAutoparts] = useState([]);
+  const [newAutopart, setNewAutopart] = useState({
+    Name: "",
+    Description: "",
+    Inventory: 0,
+    Value: 0,
+    RawMaterialId: "",
+  });
+  const [showModal, setShowModal] = useState(false);
+  const [modalAction, setModalAction] = useState("create");
+  const [selectedAutopartId, setSelectedAutopartId] = useState("");
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchAutoparts = async () => {
       try {
-        const response = await fetch("https://localhost:7028/api/autoparts");
-
-        if (response.ok) {
-          const data = await response.json();
-          setAutopart(data);
-        } else {
-          console.error("Error en la solicitud a la API");
-        }
+        const response = await axios.get(
+          `https://localhost:7028/api/autoparts`
+        );
+        setAutoparts(response.data);
       } catch (error) {
-        console.error("Error al realizar la solicitud a la API", error);
+        console.error("Error fetching autoparts:", error);
       }
     };
 
-    fetchData();
-  }, []);
+    fetchAutoparts();
+  }, [subcategoryId]);
 
-  const handleItemPress = (item) => {
-    setSelectedItem(item);
+  const handleCreateAutopart = async () => {
+    try {
+      const response = await axios.post(
+        `https://localhost:7028/api/subcategories/${subcategoryId}/autoparts`,
+        newAutopart
+      );
 
-    setModalVisible(true);
+      setAutoparts([response.data, ...autoparts]);
+
+      setNewAutopart({
+        Name: "",
+        Description: "",
+        Inventory: 0,
+        Value: 0,
+        RawMaterialId: "",
+      });
+      handleCloseModal();
+    } catch (error) {
+      console.error("Error creating autopart:", error);
+    }
   };
 
+  const handleUpdateAutopart = async () => {
+    try {
+      await axios.put(
+        `https://localhost:7028/api/subcategories/${subcategoryId}/autoparts/${selectedAutopartId}`,
+        newAutopart
+      );
+
+      const response = await axios.get(
+        `https://localhost:7028/api/subcategories/${subcategoryId}/autoparts`
+      );
+
+      const updatedAutoparts = response.data;
+
+      setAutoparts(updatedAutoparts);
+
+      setNewAutopart({
+        Name: "",
+        Description: "",
+        Inventory: 0,
+        Value: 0,
+        RawMaterialId: "",
+      });
+
+      handleCloseModal();
+    } catch (error) {
+      console.error("Error updating autopart:", error);
+    }
+  };
+
+  const handleDeleteAutopart = async (autopartId) => {
+    try {
+      await axios.delete(
+        `https://localhost:7028/api/subcategories/${subcategoryId}/autoparts/${autopartId}`
+      );
+
+      const updatedAutoparts = autoparts.filter(
+        (autopart) => autopart.autopartID !== autopartId
+      );
+      setAutoparts(updatedAutoparts);
+    } catch (error) {
+      console.error("Error deleting autopart:", error);
+    }
+  };
+
+  const handleShowCreateModal = () => {
+    setModalAction("create");
+    setShowModal(true);
+  };
+
+  const handleShowEditModal = (autopartId) => {
+    setModalAction("edit");
+    setSelectedAutopartId(autopartId);
+
+    const selectedAutopart = autoparts.find(
+      (autopart) => autopart.autopartID === autopartId
+    );
+
+    if (selectedAutopart) {
+      setNewAutopart({
+        Name: selectedAutopart.name || "",
+        Description: selectedAutopart.description || "",
+        Inventory: selectedAutopart.inventory || 0,
+        Value: selectedAutopart.value || 0,
+        RawMaterialId: selectedAutopart.rawMaterialId || "",
+      });
+    }
+
+    setShowModal(true);
+  };
+
+  const handleShowDetailModal = (autopartId) => {
+    setModalAction("detail");
+    setSelectedAutopartId(autopartId);
+
+    const selectedAutopart = autoparts.find(
+      (autopart) => autopart.autopartID === autopartId
+    );
+
+    if (selectedAutopart) {
+      setNewAutopart({
+        Name: selectedAutopart.name || "",
+        Description: selectedAutopart.description || "",
+        Inventory: selectedAutopart.inventory || 0,
+        Value: selectedAutopart.value || 0,
+        RawMaterialId: selectedAutopart.rawMaterialId || "",
+      });
+    }
+
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setNewAutopart({
+      Name: "",
+      Description: "",
+      Inventory: 0,
+      Value: 0,
+      RawMaterialId: "",
+    });
+    setSelectedAutopartId("");
+  };
+
+  // const handleShowLosses = (autopartId) => {
+  //   // Redirige a la ruta "/autopart-losses" con el parámetro "autopartId"
+  //   history.push("/autopart-losses", { autopartId });
+  // };
+
+  const renderItem = ({ item }) => (
+    <Card style={styles.card}>
+      <Card.Content>
+        <Text style={styles.cardTitle}>Nombre: </Text>
+        <Text style={styles.cardText}>{item.name}</Text>
+        <Text style={styles.cardTitle}>Descripción: </Text>
+        <Text style={styles.cardText}>{item.description}</Text>
+
+        <Text style={styles.cardTitle}>Inventario: </Text>
+        <Text style={styles.cardText}>{item.inventory}</Text>
+
+        <Text style={styles.cardTitle}>Valor: </Text>
+        <Text style={styles.cardText}>{item.value}</Text>
+
+        <Divider />
+      </Card.Content>
+    </Card>
+  );
+
   return (
-    <View style={styles.container}>
-      <View style={styles.navbar}>
-        <Image source={Logo} style={styles.logo} />
+    <View>
+      <View style={styles.cardTotal}>
+        <View style={styles.header}>
+          <Image source={Logo} style={styles.logo} />
+          <Text style={styles.titleLogo}>AUTOPARTES JUCAR SAS</Text>
+        </View>
+        <Text style={styles.title}>Lista de Autopartes Actuales</Text>
 
-        <Text style={styles.title}>AUTOPARTES JUCAR SAS</Text>
+        <FlatList
+          data={autoparts}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.autopartID.toString()}
+        />
       </View>
-      <Text style={styles.header}>Autopartes</Text>
-      // Table
-      <ScrollView style={styles.container}>
-        {/*botones crud */}
-        <View style={styles.tab}>
-          <TouchableOpacity onPress={() => navigation.navigate("AllAutoparts")}>
-            <Image source={agregarUsu} style={styles.tabIcon} />
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => navigation.navigate("AllAutoparts")}>
-            <Image source={ajustes} style={styles.tabIcon} />
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => navigation.navigate("AllAutoparts")}>
-            <Image source={agregarUsu} style={styles.tabIcon} />
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => navigation.navigate("AllAutoparts")}>
-            <Image source={agregarUsu} style={styles.tabIcon} />
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.tableContainer}>
-          <View style={styles.tableHeader}>
-            <Text style={styles.headerText}>AutopartID</Text>
-            <Text style={styles.headerText}>Nombre</Text>
-            <Text style={styles.headerText}>Descripción</Text>
-            <Text style={styles.headerText}>Inventario</Text>
-            <Text style={styles.headerText}>Valor </Text>
-            <Text style={styles.headerText}>Estado</Text>
-          </View>
-
-          {autoparts.map((autopart) => (
-            <View key={autopart.AutopartID} style={styles.row}>
-              <Text style={styles.cell}>{autopart.nombre}</Text>
-              <Text style={styles.cell}>{usuario.descripcion}</Text>
-              <Text style={styles.cell}>{usuario.Inventario}</Text>
-              <Text style={styles.cell}>{usuario.Valor}</Text>
-              <Text style={styles.cell}>{usuario.Estado}</Text>
-            </View>
-          ))}
-        </View>
-      </ScrollView>
-      {/* <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View
-          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
-          <View
-            style={{ backgroundColor: "white", padding: 20, borderRadius: 10 }}
-          >
-            {selectedItem && (
-              <>
-                <Text>AutopartID: {selectedItem.AutopartID}</Text>
-
-                <Text>Nombre: {selectedItem.name}</Text>
-
-                <Text>Descripción: {selectedItem.Descripcion}</Text>
-
-                <Text>Inventario: {selectedItem.Inventory}</Text>
-
-                <Text>Valor: {selectedItem.value}</Text>
-
-                <Text>Estado: {selectedItem.State}</Text>
-              </>
-            )}
-
-            <Pressable onPress={() => setModalVisible(false)}>
-              <Text style={{ color: "blue", marginTop: 10 }}>Cerrar</Text>
-            </Pressable>
-          </View>
-        </View>
-      </Modal> */}
     </View>
   );
 };
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#F5F5DC",
-    justifyContent: "flex-start",
-    alignItems: "center",
-    paddingTop: "5%",
+  cardTotal: {
+    borderRadius: 30,
+    width: "80%",
+    backgroundColor: "#fff",
+    padding: 25,
+    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.25)", // Reemplazo de las propiedades de sombra
+    elevation: 5,
+    alignSelf: "center",
+    marginTop: 50,
   },
-  scrollContainer: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
-  },
-  dataTable: {
-    marginTop: 16,
-  },
-  navbar: {
-    backgroundColor: "#f80759",
-    color: "#fff",
-    borderColor: "#03a9f4",
+  header: {
     flexDirection: "row",
-    justifyContent: "space-evenly",
-    alignItems: "flex-start",
-    padding: 30,
-    fontWeight: 500,
-
-    marginTop: 1,
+    alignItems: "center",
+    paddingVertical: 20,
   },
   logo: {
     width: 107,
     height: 57,
     resizeMode: "contain",
-    marginLeft: 50,
+    marginRight: 10,
+  },
+  titleLogo: {
+    fontSize: 18,
+    fontWeight: "bold",
   },
   title: {
-    fontSize: 18,
-    color: "#fff",
+    fontSize: 20,
     fontWeight: "bold",
-    marginLeft: 128,
-    marginRight: -21,
-    marginBottom: -19,
-    width: 269.906,
-    height: 68,
+    marginBottom: 20,
+    textAlign: "center",
   },
-  //table ->
-  container: {
-    padding: 16,
-    backgroundColor: "#F5F5F5",
+  card: {
+    marginHorizontal: 10,
+    marginVertical: 5,
   },
-  header: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 16,
-  },
-  tableContainer: {
-    borderWidth: 1,
-    borderColor: "#CCCCCC",
-  },
-  tableHeader: {
-    flexDirection: "row",
-    backgroundColor: "#EEEEEE",
-    padding: 8,
-  },
-  headerText: {
-    flex: 1,
+  cardTitle: {
     fontWeight: "bold",
   },
-  row: {
-    flexDirection: "row",
-    borderBottomWidth: 1,
-    borderBottomColor: "#CCCCCC",
-    padding: 8,
+  cardText: {
+    marginBottom: 10,
   },
-  cell: {
-    flex: 1,
-    borderRightWidth: 1,
-    borderRightColor: "#CCCCCC",
-    paddingHorizontal: 8,
+  cardActions: {
+    justifyContent: "space-around",
   },
-  //table <-
-
-  //botonesCrud
-  tab: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "flex-start",
-    flexDirection: "row",
-  },
-  tabIcon: {
-    // Adjust image dimensions as needed
-    width: 30,
-    height: 30,
-  },
-  //botonesCrud
 });
-
 export default AllAutoparts;
